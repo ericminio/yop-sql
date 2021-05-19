@@ -1,0 +1,10 @@
+{
+  "connections":[
+    {
+      "active" : true,
+      "url" : "jdbc:oracle:thin:@localhost:1521:XE",
+      "username" : "system",
+      "password" : "oracle"
+    }
+  ]
+}
