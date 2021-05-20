@@ -1,0 +1,7 @@
+{
+    "connections":{
+        "url" : "broken-url",
+        "username" : "broken",
+        "password" : "connection"
+    }
+}
