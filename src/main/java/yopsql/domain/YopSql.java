@@ -4,7 +4,6 @@ import yopsql.support.BuildConfiguration;
 import yopsql.support.Read;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.logging.Logger;
 
 import static java.lang.String.format;
@@ -21,12 +20,9 @@ public class YopSql {
         logger.info(format("output = %s", environment.getOutput()));
 
         try {
-            Connection connection = connectionTest.please(getConfiguration());
+            connectionTest.please(getConfiguration());
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-        finally {
-            logger.info("Done");
+            logger.info("Exiting");
         }
     }
 

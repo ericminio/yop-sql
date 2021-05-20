@@ -5,6 +5,10 @@ import org.junit.Test;
 import yopsql.logging.LogSink;
 import yopsql.support.PropertyProviderUsingMap;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -15,17 +19,19 @@ public class YopSqlStartTest {
     private PropertyProviderUsingMap propertyProvider;
 
     @Before
-    public void sut() {
+    public void sut() throws IOException {
         yopSql = new YopSql();
         logSink = new LogSink();
         yopSql.logger = logSink.getLogger();
         yopSql.connectionTest.logger = logSink.getLogger();
 
         propertyProvider = new PropertyProviderUsingMap();
-        propertyProvider.setConfig("/this/config");
+        propertyProvider.setConfig("src/test/resources/configuration.json");
         propertyProvider.setInput("/this/input");
         propertyProvider.setOutput("/this/output");
         yopSql.environment.setPropertyProvider(propertyProvider);
+
+
     }
 
     @Test
@@ -37,7 +43,7 @@ public class YopSqlStartTest {
     @Test
     public void disclosesConfiguration() {
         yopSql.start();
-        assertThat(logSink.getLog(), containsString("config = /this/config"));
+        assertThat(logSink.getLog(), containsString("config = src/test/resources/configuration.json"));
     }
 
     @Test
@@ -54,18 +60,28 @@ public class YopSqlStartTest {
 
     @Test
     public void disclosesConnectionTestSuccess() {
-        propertyProvider.setConfig("src/test/resources/local-oracle.json");
+        yopSql.connectionTest.database = new Database() {
+            @Override
+            public Connection connection(Configuration configuration) throws SQLException {
+                return null;
+            }
+        };
         yopSql.start();
-        assertThat(logSink.getLog(), containsString("Connection test to jdbc:oracle:thin:@localhost:1521:XE"));
+        assertThat(logSink.getLog(), containsString("Connection test to this-url"));
         assertThat(logSink.getLog(), containsString("Connection test successful"));
     }
 
     @Test
     public void disclosesConnectionTestFailure() {
-        propertyProvider.setConfig("src/test/resources/broken-connection.json");
+        yopSql.connectionTest.database = new Database() {
+            @Override
+            public Connection connection(Configuration configuration) throws SQLException {
+                throw new SQLException();
+            }
+        };
         yopSql.start();
-        assertThat(logSink.getLog(), containsString("Connection test to broken-url"));
+        assertThat(logSink.getLog(), containsString("Connection test to this-url"));
         assertThat(logSink.getLog(), containsString("Connection test failed"));
-        assertThat(logSink.getLog(), containsString("Done"));
+        assertThat(logSink.getLog(), containsString("Exiting"));
     }
 }

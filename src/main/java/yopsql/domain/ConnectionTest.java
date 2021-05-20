@@ -8,18 +8,18 @@ import static java.lang.String.format;
 
 public class ConnectionTest {
     public Logger logger = Logger.getLogger(ConnectionTest.class.getName());
+    public Database database = new DatabaseUsingOjdbc();
 
     public Connection please(Configuration configuration) {
         logger.info(format("Connection test to %s", configuration.getUrl()));
         Connection connection = null;
         try {
-            connection = new Database().connection(configuration);
-        } catch (SQLException throwables) {
+            connection = database.connection(configuration);
+        } catch (SQLException connecting) {
             logger.info("Connection test failed");
+            throw new RuntimeException(connecting);
         }
-        finally {
-            logger.info("Connection test successful");
-            return connection;
-        }
+        logger.info("Connection test successful");
+        return connection;
     }
 }

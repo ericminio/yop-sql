@@ -1,6 +1,6 @@
 {
     "connections":{
-        "url" : "jdbc:oracle:thin:@localhost:1521:XE",
+        "url" : "jdbc:oracle:thin:@oracle:1521:XE",
         "username" : "system",
         "password" : "oracle"
     }
